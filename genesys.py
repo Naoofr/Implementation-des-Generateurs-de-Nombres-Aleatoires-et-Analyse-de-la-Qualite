@@ -9,6 +9,4 @@ def generate_random_binary_number(taille_octets=4):
     """
     bytes_data = os.urandom(taille_octets)
     number = int.from_bytes(bytes_data, 'big')
-    return bin(number)
-
-print(generate_random_binary_number(128))
+    return number
