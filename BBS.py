@@ -18,5 +18,3 @@ def BBS_generator(p = 1000003, q =  2001911, M = p * q, seed = randint(2, 10), T
     bits += str(bit)
 
   return int(bits, 2)
-
-

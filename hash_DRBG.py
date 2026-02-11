@@ -1,5 +1,6 @@
 import hashlib
 import math
+import os
 
 # --- paramètres ---
 HASH = hashlib.sha256
@@ -70,13 +71,3 @@ class HashDRBG:
         for a in args:
             total += int.from_bytes(a, "big")
         return int_to_bytes(total % (1 << SEEDLEN), SEEDLEN // 8)
-
-
-
-entropy = b"entropie_de_qualite_suffisante_ici"
-nonce = b"nonce_unique"
-
-drbg = HashDRBG(entropy, nonce)
-
-random_bytes = drbg.generate(256)
-print(random_bytes.hex())

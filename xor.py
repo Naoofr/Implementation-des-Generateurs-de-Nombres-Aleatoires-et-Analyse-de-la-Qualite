@@ -11,6 +11,3 @@ def xor_generator(input1 = BBS.BBS_generator(TAILLE_NB_GENERE=128), input2 = gen
     
     a=xor(input1,input2)
     return a
-
-
-print("Résultat du xor : ", xor_generator())

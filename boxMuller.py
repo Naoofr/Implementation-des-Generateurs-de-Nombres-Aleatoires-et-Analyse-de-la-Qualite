@@ -61,16 +61,5 @@ def run_simulation(iterations=100, samples_per_iter=1000):
         entropies.append(calculate_entropy(buffer))
     
     avg_entropy = sum(entropies) / len(entropies)
-    max_entropy = max(entropies)
-    min_entropy = min(entropies)
-    
-    print(f"--- Résultats sur {iterations} simulations ({samples_per_iter} nombres par simulation) ---")
-    print(f"Moyenne de l'entropie : {avg_entropy:.6f} bits/octet")
-    print(f"Entropie la plus forte : {max_entropy:.6f} bits/octet")
-    print(f"Entropie la plus faible : {min_entropy:.6f} bits/octet")
 
-if __name__ == "__main__":
-    run_simulation()
-    print(str(bin(xor(0x12345678, 0x87654321))))
-
-
+    print(f"Moyenne de l'entropie pour {iterations} simulations : {avg_entropy:.6f} bits/octet")

@@ -1,4 +1,4 @@
-import scipy.stats
+import spicy
 from collections import Counter
 import os
 
