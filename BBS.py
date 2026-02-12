@@ -26,7 +26,7 @@ def BBS_generator(p = 1000003, q =  2001911, M = p * q, seed = randint(2, 10), T
 # --- Génère une grande séquence de bits ---
 def generate_bits(n_bits=5000):
     x = BBS_generator(TAILLE_NB_GENERE=n_bits)
-    bits = bin(x)[2:].zfill(n_bits)   # forcer la taille
+    bits = bin(x)[2:].zfill(n_bits)
     return np.array([int(b) for b in bits])
 
 # --- Autocorrélation ---
@@ -38,6 +38,3 @@ def autocorrelation(x, max_lag=50):
         c = np.corrcoef(x[:-lag], x[lag:])[0,1]
         result.append(c)
     return result
-
-# --- Test ---
-

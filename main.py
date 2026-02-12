@@ -94,10 +94,11 @@ print("Résultat de chi-carré sur os.urandom : ", chi_os)
 
 
 # Autocorrélation (lags 1, 8, . . . )
+print("\n-------Test d'autocorrélation de l'agorithme BBS-------")
 bits = BBS.generate_bits(5000)
 ac = BBS.autocorrelation(bits, max_lag=40)
+print("Résultat : cf graph")
 
-# --- Affichage ---
 plt.stem(range(1, 41), ac)
 plt.axhline(0, linestyle='--')
 plt.title("Autocorrélation des bits BBS")
@@ -106,8 +107,25 @@ plt.ylabel("Corrélation")
 plt.show()
 
 
+print("\n-------Test d'autocorrélation de l'agorithme du xor-------")
+bits = bin(xor.xor_generator(5000))[2:]
+res = np.array([int(b) for b in bits])
+ac = BBS.autocorrelation(res, max_lag=40)
+print("Résultat : cf graph")
+
+plt.stem(range(1, 41), ac)
+plt.axhline(0, linestyle='--')
+plt.title("Autocorrélation des bits du xor")
+plt.xlabel("Lag (retard)")
+plt.ylabel("Corrélation")
+plt.show()
+
+
 # Test de Kolmogorov–Smirnov (KS)
 
 
+
+
+#---------Tests statistiques---------
 print("\n--- Vérification de la prédiction ---")
 print(f"4ème nombre réel du LCG : {mon_lcg.suivant()}")
