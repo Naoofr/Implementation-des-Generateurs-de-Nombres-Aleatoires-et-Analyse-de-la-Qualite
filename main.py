@@ -126,6 +126,9 @@ plt.show()
 
 
 
-#---------Tests statistiques---------
+#---------Attaques---------
+
+
+#-------Récupération de la graine LCG-------
 print("\n--- Vérification de la prédiction ---")
 print(f"4ème nombre réel du LCG : {mon_lcg.suivant()}")

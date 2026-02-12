@@ -36,33 +36,60 @@ def generer_octets(generateur, quantite):
         octets.append((val >> 24) & 0xFF)
     return octets
 
-# Exécution des tests
-print("Analyse statistiques sur 100 000 nombres ")
+def ks_test_uniform(binary_data):
+    """
+    Effectue un test de Kolmogorov-Smirnov sur des données binaires.
+    1. Transforme le binaire en valeurs normalisées (0-255 -> 0.0-1.0)
+    2. Calcule la statistique D_n (distance maximale)
+    """
+    n = len(binary_data)
+    if n == 0:
+        return None
 
-# 1. Test du LCG
-lcg = LCG(graine=12345)
-data_lcg = generer_octets(lcg, 25000)
-ent_lcg = calcul_entropie(data_lcg)
-chi_lcg = test_chi_carre(data_lcg)
-print(f"\n[LCG]")
-print(f"Entropie (Idéal = 8.0) : {ent_lcg:.5f}")
-print(f"Chi-carré (Idéal ~ 255): {chi_lcg:.2f}")
-# 2. Test du Mersenne Twister
-mt = MersenneTwister(graine=12345)
-data_mt = generer_octets(mt, 25000)
-ent_mt = calcul_entropie(data_mt)
-chi_mt = test_chi_carre(data_mt)
-print(f"\n[Mersenne Twister]")
-print(f"Entropie (Idéal = 8.0) : {ent_mt:.5f}")
-print(f"Chi-carré (Idéal ~ 255): {chi_mt:.2f}")
+    # 1. Conversion des octets en float normalisés [0, 1]
+    # On crée la Fonction de Répartition Empirique (ECDF)
+    data_sorted = sorted([b / 256.0 for b in binary_data])
 
-# Interprétation simple
-def verdict(chi_score):
-    if 200 < chi_score < 320:
-        return "Succès (Distribution uniforme)"
-    else:
-        return "Echec (Distribution biaisée)"
+    d_max = 0.0
 
-print("\n VERDICT")
-print(f"LCG              : {verdict(chi_lcg)}")
-print(f"Mersenne Twister : {verdict(chi_mt)}")
+    # 2. Calcul de la distance maximale Dn
+    # On compare chaque point i à la droite théorique y = x
+    for i in range(n):
+        x = data_sorted[i]
+        
+        # Distance au point i (échelon supérieur de l'escalier)
+        d_plus = (i + 1) / n - x
+        
+        # Distance au point i (échelon inférieur de l'escalier)
+        d_moins = x - i / n
+        
+        d_max = max(d_max, d_plus, d_moins)
+
+    # 3. Calcul approximatif de la p-value (Formule de Kolmogorov)
+    # Pour n > 35, on peut utiliser une approximation
+    p_value = calculate_ks_p_value(d_max, n)
+
+    return d_max, p_value
+
+def calculate_ks_p_value(d_max, n):
+    """
+    Approximation de la p-value pour la statistique de Kolmogorov.
+    Une p-value proche de 0 indique que les données ne sont PAS uniformes.
+    """
+    # Statistique normalisée
+    sqrt_n = math.sqrt(n)
+    z = (sqrt_n + 0.12 + 0.11 / sqrt_n) * d_max
+    
+    # Formule de la distribution de Kolmogorov (Série de Taylor)
+    if z < 0.27:
+        return 1.0
+    if z > 4.0:
+        return 0.0
+        
+    # Approximation simplifiée de la série
+    sum_k = 0
+    for k in range(1, 101):
+        sign = -1 if k % 2 != 0 else 1
+        sum_k += 2 * sign * math.exp(-2 * (k * z)**2)
+    
+    return min(max(sum_k, 0.0), 1.0)
