@@ -12,6 +12,8 @@ import tests_stats
 
 # Autres importations
 import os
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 
@@ -66,12 +68,14 @@ print("Valeur générée à la suite du xor : ", res_xor)
 
 
 #---------Tests statistiques---------
-print("-------Test statistiques sur nos générateurs-------")
+print("\n\n-------Test statistiques sur nos générateurs-------")
+
 
 # Estimation d’entropie (Shannon) par octet
 print("\n-------Test d'entropie de Shannon par octet sur Box-Muller-------")
-tes1 = boxMuller.run_simulation()
-print("\n-------Test d'entropie de Shannon par octet sur Box-Muller-------")
+test1 = boxMuller.run_simulation()
+print(test1)
+print("\n-------Test d'entropie de Shannon par octet sur l'algorithme LCG-------")
 lcg = LCG(graine=12345)
 data_lcg = tests_stats.generer_octets(lcg, 1000)
 test_LCG = tests_stats.calcul_entropie(data_lcg)
@@ -79,7 +83,30 @@ print("Entropie sur LCG : ", test_LCG)
 
 
 # Test du χ2 (chi-carré) pour l’uniformité des octets.
+print("\n-------Test du χ2 sur l'algorithme LCG-------")
+chi_lcg = tests_stats.test_chi_carre(data_lcg)
+print("Résultat du chi-carré sur LCG : ", chi_lcg)
 
+print("\n-------Test du χ2 sur os.urandom-------")
+data_os = genesys.generer_octets()
+chi_os = tests_stats.test_chi_carre(data_os)
+print("Résultat de chi-carré sur os.urandom : ", chi_os)
+
+
+# Autocorrélation (lags 1, 8, . . . )
+bits = BBS.generate_bits(5000)
+ac = BBS.autocorrelation(bits, max_lag=40)
+
+# --- Affichage ---
+plt.stem(range(1, 41), ac)
+plt.axhline(0, linestyle='--')
+plt.title("Autocorrélation des bits BBS")
+plt.xlabel("Lag (retard)")
+plt.ylabel("Corrélation")
+plt.show()
+
+
+# Test de Kolmogorov–Smirnov (KS)
 
 
 print("\n--- Vérification de la prédiction ---")

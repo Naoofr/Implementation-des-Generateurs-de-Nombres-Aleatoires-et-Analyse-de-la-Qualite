@@ -40,13 +40,4 @@ def autocorrelation(x, max_lag=50):
     return result
 
 # --- Test ---
-bits = generate_bits(5000)
-ac = autocorrelation(bits, max_lag=40)
 
-# --- Affichage ---
-plt.stem(range(1, 41), ac)
-plt.axhline(0, linestyle='--')
-plt.title("Autocorrélation des bits BBS")
-plt.xlabel("Lag (retard)")
-plt.ylabel("Corrélation")
-plt.show()

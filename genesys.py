@@ -10,3 +10,10 @@ def generate_random_binary_number(taille_octets=4):
     bytes_data = os.urandom(taille_octets)
     number = int.from_bytes(bytes_data, 'big')
     return number
+
+
+def generer_octets(taille=1, nb=10000):
+    b=[]
+    for i in range(nb) :
+        b.append(generate_random_binary_number(taille))
+    return b

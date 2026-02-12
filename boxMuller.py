@@ -62,4 +62,4 @@ def run_simulation(iterations=100, samples_per_iter=1000):
     
     avg_entropy = sum(entropies) / len(entropies)
 
-    print(f"Moyenne de l'entropie pour {iterations} simulations : {avg_entropy:.6f} bits/octet")
+    return f"Entropie sur Box-Muller : {avg_entropy:.6f} bits/octet"
