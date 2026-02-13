@@ -9,6 +9,10 @@ import boxMuller
 # Importations des tests
 import tests_stats
 
+#Inmport des attaques
+import attaque_lcg
+import attaque_mt
+
 
 # Autres importations
 import os
@@ -85,12 +89,12 @@ print("Entropie sur LCG : ", test_LCG)
 # Test du χ2 (chi-carré) pour l’uniformité des octets.
 print("\n-------Test du χ2 sur l'algorithme LCG-------")
 chi_lcg = tests_stats.test_chi_carre(data_lcg)
-print("Résultat du chi-carré sur LCG : ", chi_lcg)
+print("Résultat du chi-carré sur LCG : ", chi_lcg[0], " et la valeur de p : ", chi_lcg[1])
 
 print("\n-------Test du χ2 sur os.urandom-------")
 data_os = genesys.generer_octets()
 chi_os = tests_stats.test_chi_carre(data_os)
-print("Résultat de chi-carré sur os.urandom : ", chi_os)
+print("Résultat de chi-carré sur os.urandom : ", chi_os[0], " et la valeur de p : ", chi_os[1])
 
 
 # Autocorrélation (lags 1, 8, . . . )
@@ -122,7 +126,17 @@ plt.show()
 
 
 # Test de Kolmogorov–Smirnov (KS)
+print("\n-------Test de Kolmogorov-Smirnov sur l'algorithme BBS-------")
+bits = BBS.generate_bits(255)
+res = tests_stats.ks_test_uniform(bits)
+print("Résultat du test : ", res[0], " et la valeur de p : ", res[1])
 
+
+print("\n-------Test de Kolmogorov-Smirnov de l'agorithme du xor-------")
+a = bin(xor.xor_generator(255))[2:]
+bits = np.array([int(b) for b in bits])
+res = tests_stats.ks_test_uniform(bits)
+print("Résultat du test : ", res[0], " et la valeur de p : ", res[1])
 
 
 
@@ -130,5 +144,53 @@ plt.show()
 
 
 #-------Récupération de la graine LCG-------
+print("\n-------Attaque sur LCG-------")
+valeur1 = 1103527590
+valeur2 = 377401575
+valeur3 = 662824084
+MODULO_CONNU = 2**31
+print(f"Attaque sur les valeurs : {valeur1}, {valeur2}, {valeur3}")
+print("Recherche des constantes secrètes a et c...")
+a_hack, c_hack = attaque_lcg.attaque_lcg(valeur1, valeur2, valeur3, MODULO_CONNU)
+print(f"\nRésultat du Hack :")
+print(f"Multiplicateur (a) trouvé : {a_hack}")
+print(f"Incrément (c) trouvé      : {c_hack}")
+# Vérification
+prochain_calcul = (a_hack * valeur3 + c_hack) % MODULO_CONNU
+print(f"\nPrédiction du 4ème nombre : {prochain_calcul}")
+
+
 print("\n--- Vérification de la prédiction ---")
 print(f"4ème nombre réel du LCG : {mon_lcg.suivant()}")
+
+
+
+#---------Reconstruction d’´etat MT19937--------------
+print("\n-------Attaque sur MT19937-------")
+print("1. Preparation de la victime ")
+vrai_mt = MersenneTwister(graine=1234)
+print("La victime génère des nombres...")
+valeurs_observees = []
+for i in range(624):
+    valeurs_observees.append(vrai_mt.suivant())
+
+print(f"J'ai capturé {len(valeurs_observees)} valeurs.")
+
+print("\n2. Reconstruction de l'état")
+etat_reconstruit = []
+for val in valeurs_observees:
+    etat_interne = attaque_mt.inverser_tempering(val)
+    etat_reconstruit.append(etat_interne)
+clone_mt = MersenneTwister(graine=0)
+clone_mt.mt = list(etat_reconstruit)
+clone_mt.index = 624
+print("Clonage terminé. Le clone est prêt.")
+print("\n--- 3. Vérification (Prédiction du futur) ---")
+prochain_vrai = vrai_mt.suivant()
+print(f"La victime génère : {prochain_vrai}")
+prochain_clone = clone_mt.suivant()
+print(f"Le clone prédit   : {prochain_clone}")
+if prochain_vrai == prochain_clone:
+    print("\n[Succès] Le générateur est cloné.")
+else:
+    print("\n[Echec] Les valeurs sont différentes.")
