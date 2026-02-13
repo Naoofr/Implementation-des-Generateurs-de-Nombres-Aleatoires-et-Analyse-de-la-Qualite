@@ -83,26 +83,33 @@ def ks_test_uniform(binary_data):
 
     return d_max, p_value
 
+import math
+
 def calculate_ks_p_value(d_max, n):
     """
-    Approximation de la p-value pour la statistique de Kolmogorov.
+    Calcule la p-value en utilisant la série de Kolmogorov.
     Une p-value proche de 0 indique que les données ne sont PAS uniformes.
     """
-    # Statistique normalisée
+    # Statistique normalisée (ajustement de Stephens pour n > 35)
     sqrt_n = math.sqrt(n)
     z = (sqrt_n + 0.12 + 0.11 / sqrt_n) * d_max
     
-    # Formule de la distribution de Kolmogorov (Série de Taylor)
     if z < 0.27:
         return 1.0
     if z > 4.0:
         return 0.0
         
-    # Approximation simplifiée de la série
-    sum_k = 0
+    # Formule de la série pour la p-value : 2 * sum_{k=1}^inf (-1)^{k-1} * exp(-2 * k^2 * z^2)
+    p_value = 0
     for k in range(1, 101):
-        sign = -1 if k % 2 != 0 else 1
-        sum_k += 2 * sign * math.exp(-2 * (k * z)**2)
-    
+        # Le signe alterne : k=1 (+), k=2 (-), k=3 (+)...
+        sign = 1 if k % 2 != 0 else -1
+        term = 2 * sign * math.exp(-2 * (k * z)**2)
+        p_value += term
+        
+        # Condition d'arrêt si le terme devient insignifiant
+        if abs(term) < 1e-10:
+            break
 
-    return min(max(sum_k, 0.0), 1.0)
+    return min(max(p_value, 0.0), 1.0)
+
