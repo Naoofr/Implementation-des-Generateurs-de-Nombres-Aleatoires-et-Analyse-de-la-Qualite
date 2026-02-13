@@ -15,16 +15,28 @@ def calcul_entropie(donnees):
         entropie -= p * math.log2(p)
     return entropie
 
+import math
+
 def test_chi_carre(donnees):
     taille = len(donnees)
-    attendu = taille / 256
+    attendu = taille / 256.0                     
     comptage = [0] * 256
+    
     for octet in donnees:
         comptage[octet] += 1
-    chi2 = 0
+    
+    chi2 = 0.0
     for observe in comptage:
         chi2 += ((observe - attendu) ** 2) / attendu
-    return chi2
+    
+    # === Calcul de la p-value via approximation de Fisher ===
+    df = 255
+    if chi2 <= 0:
+        p_value = 1.0
+    else:
+        z = math.sqrt(2 * chi2) - math.sqrt(2 * df - 1.0)
+        p_value = 0.5 * math.erfc(z / math.sqrt(2.0))
+    return chi2, p_value
 
 def generer_octets(generateur, quantite):
     octets = []
@@ -92,4 +104,5 @@ def calculate_ks_p_value(d_max, n):
         sign = -1 if k % 2 != 0 else 1
         sum_k += 2 * sign * math.exp(-2 * (k * z)**2)
     
+
     return min(max(sum_k, 0.0), 1.0)
