@@ -127,15 +127,15 @@ plt.show()
 
 # Test de Kolmogorov–Smirnov (KS)
 print("\n-------Test de Kolmogorov-Smirnov sur l'algorithme BBS-------")
-bits = BBS.generate_bits(255)
-res = tests_stats.ks_test_uniform(bits)
+bits1 = BBS.generate_bits(255)
+res = tests_stats.ks_test_uniform_from_bits(bits1)
 print("Résultat du test : ", res[0], " et la valeur de p : ", res[1])
 
 
 print("\n-------Test de Kolmogorov-Smirnov de l'agorithme du xor-------")
 a = bin(xor.xor_generator(255))[2:]
-bits = np.array([int(b) for b in bits])
-res = tests_stats.ks_test_uniform(bits)
+bits2 = np.array([int(b) for b in a])
+res = tests_stats.ks_test_uniform_from_bits(bits2)
 print("Résultat du test : ", res[0], " et la valeur de p : ", res[1])
 
 
