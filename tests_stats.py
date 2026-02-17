@@ -2,6 +2,20 @@ import math
 from generators import LCG, MersenneTwister
 
 def calcul_entropie(donnees):
+    """
+    Calcule l'entropie de Shannon d'une séquence d'octets.
+
+    Paramètres
+    ----------
+    donnees : list ou iterable d'int
+        Séquence de valeurs comprises entre 0 et 255.
+
+    Retour
+    ------
+    float
+        Entropie mesurée en bits par symbole.
+    """
+
     taille = len(donnees)
     comptage = {}
     for octet in donnees:
@@ -18,6 +32,24 @@ def calcul_entropie(donnees):
 import math
 
 def test_chi_carre(donnees):
+    """
+    Effectue un test du chi-carré d'uniformité sur des octets.
+
+    Compare la distribution observée des valeurs
+    à une distribution uniforme théorique.
+
+    Paramètres
+    ----------
+    donnees : list ou iterable d'int
+        Séquence d'octets à tester.
+
+    Retour
+    ------
+    tuple (chi2, p_value)
+        chi2 : statistique du chi-carré calculée
+        p_value : probabilité associée (approximation)
+    """
+
     taille = len(donnees)
     attendu = taille / 256.0                     
     comptage = [0] * 256
@@ -39,6 +71,23 @@ def test_chi_carre(donnees):
     return chi2, p_value
 
 def generer_octets(generateur, quantite):
+    """
+    Génère une liste d'octets à partir d'un générateur pseudo-aléatoire.
+
+    Paramètres
+    ----------
+    generateur : objet
+        Instance possédant une méthode 'suivant()'.
+    quantite : int
+        Nombre d'entiers 32 bits à produire.
+
+    Retour
+    ------
+    list
+        Liste d'octets.
+    """
+
+
     octets = []
     for _ in range(quantite):
         val = generateur.suivant()
@@ -50,9 +99,24 @@ def generer_octets(generateur, quantite):
 
 def ks_test_uniform_from_bits(bit_array):
     """
-    Adapte les bits reçus du BBS pour le test de Kolmogorov-Smirnov.
-    1. Regroupe les bits par 8 pour former des octets (0-255).
-    2. Applique le test KS sur ces octets.
+    Applique le test de Kolmogorov-Smirnov à une séquence de bits.
+
+    Étapes :
+    1. Regroupe les bits par paquets de 8 pour former des octets.
+    2. Normalise les valeurs entre 0 et 1.
+    3. Calcule la statistique KS par rapport à la loi uniforme.
+
+    Paramètres
+    ----------
+    bit_array : list ou iterable
+        Séquence de bits (0 et 1).
+
+    Retour
+    ------
+    tuple (d_max, p_value) ou None
+        d_max : statistique KS maximale
+        p_value : probabilité associée
+        None si la quantité de bits est insuffisante.
     """
     n_bits = len(bit_array)
     if n_bits < 40: # Il faut assez de bits pour faire quelques octets
@@ -85,7 +149,25 @@ def ks_test_uniform_from_bits(bit_array):
     return d_max, p_value
 
 def calculate_ks_p_value(d_max, n):
-    """Approximation de la série de Kolmogorov (version corrigée)"""
+    """
+    Calcule une approximation de la p-value du test
+    de Kolmogorov-Smirnov à partir de la statistique D.
+
+    Utilise une approximation par série exponentielle
+    avec correction de Stephens.
+
+    Paramètres
+    ----------
+    d_max : float
+        Statistique KS maximale observée.
+    n : int
+        Taille de l'échantillon.
+
+    Retour
+    ------
+    float
+        p-value approximative comprise entre 0 et 1.
+    """
     sqrt_n = math.sqrt(n)
     # Ajustement de Stephens pour la précision
     z = (sqrt_n + 0.12 + 0.11 / sqrt_n) * d_max

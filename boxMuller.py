@@ -19,6 +19,20 @@ if len(sys.argv) >= 4:
 # function box_muller implements the polar form of the box muller method,
 # and returns 2 pseudo random numbers from standard normal distribution
 def box_muller():
+    """
+    Génère deux variables aléatoires indépendantes suivant
+    une loi normale centrée réduite à l'aide de
+    la méthode polaire de Box-Muller.
+
+    La méthode transforme deux variables uniformes sur [-1,1]
+    en deux variables gaussiennes.
+
+    Retour
+    ------
+    tuple (g1, g2)
+        Deux nombres pseudo-aléatoires suivant une
+        distribution normale standard.
+    """
     while True:
         u1 = 2.0 * random.random() - 1.0  # uniformly distributed random numbers
         u2 = 2.0 * random.random() - 1.0  # ditto
@@ -31,6 +45,19 @@ def box_muller():
     return g1, g2
 
 def calculate_entropy(data_bytes):
+    """
+    Calcule l'entropie de Shannon d'une séquence d'octets.
+
+    Paramètres
+    ----------
+    data_bytes : bytes ou bytearray
+        Données binaires dont on souhaite mesurer l'entropie.
+
+    Retour
+    ------
+    float
+        Entropie moyenne en bits par octet.
+    """
     if not data_bytes:
         return 0.0
     
@@ -47,6 +74,24 @@ def calculate_entropy(data_bytes):
     return entropy
 
 def run_simulation(iterations=100, samples_per_iter=1000):
+    """
+    Exécute plusieurs simulations de génération de nombres
+    via Box-Muller et calcule l'entropie moyenne des
+    données produites.
+
+    Paramètres
+    ----------
+    iterations : int
+        Nombre de simulations indépendantes.
+    samples_per_iter : int
+        Nombre total d'échantillons générés par simulation.
+
+    Retour
+    ------
+    str
+        Chaîne indiquant l'entropie moyenne obtenue
+        (en bits par octet).
+    """
     entropies = []
     
     for _ in range(iterations):
